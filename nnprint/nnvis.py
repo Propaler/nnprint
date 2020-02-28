@@ -10,35 +10,20 @@ import numpy as np
 from PIL import Image, ImageDraw
 import warnings
 
-class LeNet(nn.Module):
-    def __init__(self):
-        super(LeNet, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, (5, 5))
-        self.conv2 = nn.Conv2d(6, 16, (5, 5))
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
-
-    def forward(self, x):
-        x = F.max_pool2d(F.relu(self.conv1(x)), 2)
-        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
-        x = x.view(x.size()[0], -1)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        return x
+from models import ThLeNet, TFLeNet
 
 def create_model(framework='keras'):
+    framework = framework.casefold()
+    model = None
     if framework == 'keras':
-        model = tf.keras.models.Sequential([
-            keras.layers.Dense(512, activation='relu', input_shape=(784,)),
-            keras.layers.Dropout(0.2),
-            keras.layers.Dense(10)
-        ])
-
-        return model
+        model = TFLeNet().model()
     elif framework == 'torch':
-        return LeNet()
+        model = ThLeNet()
+
+    if not model:
+        raise NotImplemented(f"There is no support for {framework} framework.")
+    
+    return model
 
 
 def create_whiteboard(shape=(600, 600), color="white"):
@@ -155,7 +140,7 @@ def nnprint(model, save_path="vis01.png"):
 
         return base
 
-    elif(isinstance(model,tf.keras.Model)):
+    elif isinstance(model,tf.keras.Model):
         warnings.warn(
             "loading keras model.",
             Warning,
@@ -213,7 +198,7 @@ def nnprint(model, save_path="vis01.png"):
 
 
 if __name__ == "__main__":
-    model = create_model(framework='torch')
+    model = create_model(framework='keras')
     # list_created = [i.name for i in model2.layers]
     # print(list_created)
     # print(model2.summary())
@@ -221,5 +206,5 @@ if __name__ == "__main__":
     # print(list_created)
 
     # nnprint(model_tf, "../images/test.png")
-    nnprint(model, "../images/test.png")
+    nnprint(model, "../images/test2.png")
 
