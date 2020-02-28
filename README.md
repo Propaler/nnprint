@@ -1,4 +1,5 @@
-## NNPrint is a library that will help researchers to visualize a Neural Network in a intuitive way.
+![nn-print](images/logo.png)
+
 
 <p align="center">
 <a class="reference external" href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
