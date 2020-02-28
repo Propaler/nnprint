@@ -28,17 +28,20 @@ class LeNet(nn.Module):
         x = F.relu(self.fc3(x))
         return x
 
-def create_model():
-    model = tf.keras.models.Sequential([
-        keras.layers.Dense(512, activation='relu', input_shape=(784,)),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(10)
-    ])
+def create_model(framework='keras'):
+    if framework == 'keras':
+        model = tf.keras.models.Sequential([
+            keras.layers.Dense(512, activation='relu', input_shape=(784,)),
+            keras.layers.Dropout(0.2),
+            keras.layers.Dense(10)
+        ])
 
-    return model
+        return model
+    elif framework == 'torch':
+        return LeNet()
 
 
-def create_whiteboard(shape=(600, 400), color="white"):
+def create_whiteboard(shape=(600, 600), color="white"):
     return Image.new("RGB", shape, color)
 
 
@@ -210,14 +213,13 @@ def nnprint(model, save_path="vis01.png"):
 
 
 if __name__ == "__main__":
-    model_tf = LeNet()
-    model2 = create_model()
-    list_created = [i.name for i in model2.layers]
-    print(list_created)
+    model = create_model(framework='torch')
+    # list_created = [i.name for i in model2.layers]
+    # print(list_created)
     # print(model2.summary())
     
     # print(list_created)
 
     # nnprint(model_tf, "../images/test.png")
-    nnprint(model2, "../images/test.png")
+    nnprint(model, "../images/test.png")
 
