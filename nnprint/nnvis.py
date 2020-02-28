@@ -1,12 +1,14 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import tensorflow as tf
+from tensorflow import keras
 
 import random
 import numpy as np
 
 from PIL import Image, ImageDraw
-
+import warnings
 
 class LeNet(nn.Module):
     def __init__(self):
@@ -26,8 +28,20 @@ class LeNet(nn.Module):
         x = F.relu(self.fc3(x))
         return x
 
+def create_model(framework='keras'):
+    if framework == 'keras':
+        model = tf.keras.models.Sequential([
+            keras.layers.Dense(512, activation='relu', input_shape=(784,)),
+            keras.layers.Dropout(0.2),
+            keras.layers.Dense(10)
+        ])
 
-def create_whiteboard(shape=(600, 400), color="white"):
+        return model
+    elif framework == 'torch':
+        return LeNet()
+
+
+def create_whiteboard(shape=(600, 600), color="white"):
     return Image.new("RGB", shape, color)
 
 
@@ -38,7 +52,7 @@ def draw_square(
     """
     draw = ImageDraw.Draw(base)
     draw.rectangle(
-        [*topleft, topleft[0] + size, topleft[1] + size], fill, outline, width
+        [topleft, topleft[0] + size, topleft[1] + size], fill, outline, width
     )
     del draw
     return (topleft[0] + size + padding, topleft[1] + size + padding)
@@ -79,8 +93,11 @@ def nnprint(model, save_path="vis01.png"):
     base = create_whiteboard()
 
     if isinstance(model, nn.Module):
-        print("loading torch model.")
 
+        warnings.warn(
+            "loading torch model.",
+            Warning,
+        )
         # TODO make this a class who can profile the model
         # and create a dict/map/gragh of its params.
         # An Idea is to create a structure where any information about
@@ -138,9 +155,52 @@ def nnprint(model, save_path="vis01.png"):
 
         return base
 
+    elif(isinstance(model,tf.keras.Model)):
+        warnings.warn(
+            "loading keras model.",
+            Warning,
+        )
+
+        square_size = 16
+        padding = 1
+        linewidth = 1
+        extra_padding_bottom = 10
+        max_line_squares = 16
+
+        colors = color_palette(256)
+
+        initial_point = (100, 16)
+        cur_point = initial_point 
+
+        layer_names = [i.name for i in model.layers]
+
+        layer_id = 0
+
+        for layer in model.layers:
+            if isinstance(layer, keras.layers.Dense):
+                out_features = layer.units
+                weight_copy = np.absolute(layer.get_weights()[0])
+                norm = np.sum(weight_copy, axis=(1))
+                norm_map = map_to_color(norm)
+                
+                draw_text(base, cur_point, layer_names[layer_id])
+                for i in range(out_features):
+                    if i > 0 and i % max_line_squares == 0:
+                        cur_point = (cur_point[0] - (square_size + padding + linewidth) * max_line_squares, cur_point[1] + square_size + padding + linewidth)
+                    colour = colors[norm_map[i] % 256]
+                    cur_point = draw_square(base, cur_point, fill=colour)
+                    cur_point = (cur_point[0] + padding, cur_point[1] - square_size - padding)
+            
+
+            # add extra padding between layers
+            cur_point = (initial_point[0], cur_point[1] + square_size + padding + linewidth + extra_padding_bottom)
+            layer_id += 1
+
+        base.save(save_path)
+
+        return base
     else:
-        print("model type not supported yet.")
-        return
+        print("Type model supported yet ")
 
 
 # ------- TEST -------
@@ -152,9 +212,14 @@ def nnprint(model, save_path="vis01.png"):
 #     bottomright = (bottomright[0] + 1, bottomright[1] - 16 - 1)
 
 
-model = LeNet()
+if __name__ == "__main__":
+    model = create_model(framework='torch')
+    # list_created = [i.name for i in model2.layers]
+    # print(list_created)
+    # print(model2.summary())
+    
+    # print(list_created)
 
-print(model)
-
-nnprint(model, "test.png")
+    # nnprint(model_tf, "../images/test.png")
+    nnprint(model, "../images/test.png")
 
