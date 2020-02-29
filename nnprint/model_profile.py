@@ -67,7 +67,9 @@ class ModelProfile:
         layers_info_init = {}
 
         for layer in self._model.layers:
-            if isinstance(layer, keras.layers.Dense):
+            if isinstance(layer, keras.layers.Dense) or isinstance(
+                layer, keras.layers.Conv2D
+            ):
                 weight_copy = layer.get_weights()[0]
 
                 # Calculate
@@ -84,9 +86,6 @@ class ModelProfile:
                     "min": min_weights,
                     "max": max_weights,
                 }
-            if isinstance(layer, keras.layers.Conv2D):
-                continue
-
         return layers_info_init
 
     def get_layers_info(self):
