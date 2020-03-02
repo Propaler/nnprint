@@ -18,6 +18,7 @@ import warnings
 from models import ThLeNet, TFLeNet
 import utils
 
+
 def create_model(framework="keras"):
     framework = framework.casefold()
     model = None
@@ -68,7 +69,7 @@ def draw_text(base, topleft, text, fill="black", position="left"):
         offset = textsize[0] + hmargin
     elif position == "left":
         offset = -(textsize[0] + hmargin)
-    
+
     draw.multiline_text(
         (topleft[0] + offset, topleft[1]), text, fill=fill, align="left",
     )
@@ -111,8 +112,9 @@ def map_to_color(numpy_list):
 #             continue
 #         newlist.append(colors[i])
 #         prev = colors[i][0]
-    
+
 #     return newlist
+
 
 def nnprint(model, save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
@@ -227,9 +229,19 @@ def nnprint(model, save_path="vis01.png"):
         )
         for i, (colour, aprox_norm) in enumerate(legend_colors):
             if i == 0:
-                draw_text(base, (cur_point[0] - square_size - inner_square_margin, cur_point[1]), "lowest", position="right")
+                draw_text(
+                    base,
+                    (cur_point[0] - square_size - inner_square_margin, cur_point[1]),
+                    "lowest",
+                    position="right",
+                )
             elif i == len(legend_colors) - 1:
-                draw_text(base, (cur_point[0] - square_size - inner_square_margin, cur_point[1]), "highest", position="right")
+                draw_text(
+                    base,
+                    (cur_point[0] - square_size - inner_square_margin, cur_point[1]),
+                    "highest",
+                    position="right",
+                )
             cur_point = draw_square(base, cur_point, fill=colour)
             cur_point = (
                 cur_point[0] - square_size - inner_square_margin,
