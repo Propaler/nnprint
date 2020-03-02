@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 import warnings
 
 from models import ThLeNet, TFLeNet
-
+import utils
 
 def create_model(framework="keras"):
     framework = framework.casefold()
@@ -70,24 +70,25 @@ def draw_text(base, topleft, text, fill="black", position="left"):
         offset = -(textsize[0] + hmargin)
     
     draw.multiline_text(
-        (topleft[0] + offset, topleft[1]), text, fill=fill
+        (topleft[0] + offset, topleft[1]), text, fill=fill, align="left",
     )
     del draw
 
 
 def color_palette(n):
     """Generate n random distinct colors"""
-    colors = []
-    r = int(random.random() * 256)
-    g = int(random.random() * 256)
-    b = int(random.random() * 256)
-    step = 256 / n
-    for i in range(n):
-        r = int(r + step) % 256
-        g = int(g + step) % 256
-        b = int(b + step) % 256
-        colors.append((r, g, b))
+    # colors = []
+    # r = int(random.random() * 256)
+    # g = int(random.random() * 256)
+    # b = int(random.random() * 256)
+    # step = 256 / n
+    # for i in range(n):
+    #     r = int(r + step) % 256
+    #     g = int(g + step) % 256
+    #     b = int(b + step) % 256
+    #     colors.append((r, g, b))
 
+    colors = utils.pallete_mix
     return colors
 
 
@@ -98,20 +99,20 @@ def map_to_color(numpy_list):
     return np.around(rescale).astype(int)
 
 
-def group_similar_colors(colors):
-    newlist = list()
-    prev, norm = colors[0]
-    thresh = 100
-    newlist.append((prev, norm))
-    for i in range(1, len(colors)):
-        r, g, b = colors[i][0]
-        pr, pg, pb = prev
-        if abs(r - pr) <= thresh and abs(g - pg) <= thresh and abs(b - pb) <= thresh:
-            continue
-        newlist.append(colors[i])
-        prev = colors[i][0]
+# def group_similar_colors(colors):
+#     newlist = list()
+#     prev, norm = colors[0]
+#     thresh = 100
+#     newlist.append((prev, norm))
+#     for i in range(1, len(colors)):
+#         r, g, b = colors[i][0]
+#         pr, pg, pb = prev
+#         if abs(r - pr) <= thresh and abs(g - pg) <= thresh and abs(b - pb) <= thresh:
+#             continue
+#         newlist.append(colors[i])
+#         prev = colors[i][0]
     
-    return newlist
+#     return newlist
 
 def nnprint(model, save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
@@ -136,7 +137,7 @@ def nnprint(model, save_path="vis01.png"):
         max_line_squares = 16
         unique_colors = set()
 
-        n_rand_colors = 10
+        n_rand_colors = 15
         colors = color_palette(n_rand_colors)
 
         initial_point = (100, 16)
@@ -166,7 +167,7 @@ def nnprint(model, save_path="vis01.png"):
                             + linewidth,
                         )
                     colour = colors[norm_map[i] % n_rand_colors]
-                    unique_colors.add((colour, norm[i]))
+                    unique_colors.add((colour, norm_map[i] % n_rand_colors))
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,
@@ -191,7 +192,7 @@ def nnprint(model, save_path="vis01.png"):
                             + linewidth,
                         )
                     colour = colors[norm_map[i] % n_rand_colors]
-                    unique_colors.add((colour, norm[i]))
+                    unique_colors.add((colour, norm_map[i] % n_rand_colors))
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,
@@ -212,7 +213,7 @@ def nnprint(model, save_path="vis01.png"):
         # adding legend
         # FIXME should be possible set legend position
 
-        legend_colors = group_similar_colors(sorted(list(unique_colors)))
+        legend_colors = list(unique_colors)
 
         # sort by norm
         legend_colors.sort(key=lambda item: item[1])
@@ -224,8 +225,11 @@ def nnprint(model, save_path="vis01.png"):
             + extra_margin_left,
             initial_point[1],
         )
-        for colour, aprox_norm in legend_colors:
-            draw_text(base, cur_point, "{:^5.2f}".format(aprox_norm), position="right")
+        for i, (colour, aprox_norm) in enumerate(legend_colors):
+            if i == 0:
+                draw_text(base, (cur_point[0] - square_size - inner_square_margin, cur_point[1]), "lowest", position="right")
+            elif i == len(legend_colors) - 1:
+                draw_text(base, (cur_point[0] - square_size - inner_square_margin, cur_point[1]), "highest", position="right")
             cur_point = draw_square(base, cur_point, fill=colour)
             cur_point = (
                 cur_point[0] - square_size - inner_square_margin,
