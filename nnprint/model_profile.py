@@ -33,7 +33,7 @@ class ModelProfile:
 
     def fill_torch(self):
         """
-        Fill when is a keras model
+        Fill when is a torch model
         """
         layers_info_init = {}
 
@@ -41,18 +41,27 @@ class ModelProfile:
         name_counter = 0
         for m in list(self._model.modules())[1:]:
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-                weight_copy = m.weight.data.abs().clone().numpy()
+                weight_copy = m.weight.data.clone().numpy()
 
                 min_weights = np.min(weight_copy)
                 max_weights = np.max(weight_copy)
                 sd_weights = np.std(weight_copy)
                 mean_weights = np.mean(weight_copy)
 
+                # norms
+                collaped_axis = (1, 2, 3) if isinstance(m, nn.Conv2d) else (1,)
+                l1 = np.linalg.norm(weight_copy, ord=1, exis=collaped_axis)
+                l2 = np.linalg.norm(weight_copy, ord=2, exis=collaped_axis)
+
                 layers_info_init[layer_names[name_counter]] = {
                     "sd": sd_weights,
                     "mean": mean_weights,
                     "min": min_weights,
                     "max": max_weights,
+                    "norm": {
+                        "l1": l1,
+                        "l2": l2,
+                    }
                 }
 
             name_counter += 1
@@ -80,12 +89,23 @@ class ModelProfile:
                 max_weights = np.max(weight_copy)
                 sd = np.std(weight_copy)
                 mean = np.mean(weight_copy)
+
+                # norms
+                collaped_axis = (1, 2, 3) if isinstance(layer, keras.layers.Conv2D) else (1,)
+                l1 = np.linalg.norm(weight_copy, ord=1, exis=collaped_axis)
+                l2 = np.linalg.norm(weight_copy, ord=2, exis=collaped_axis)
+
                 layers_info_init[layer.name] = {
                     "sd": sd,
                     "mean": mean,
                     "min": min_weights,
                     "max": max_weights,
+                    "norm": {
+                        "l1": l1,
+                        "l2": l2,
+                    }
                 }
+
         return layers_info_init
 
     def get_layers_info(self):
