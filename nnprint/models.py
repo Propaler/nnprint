@@ -33,11 +33,17 @@ class ThLeNet(nn.Module):
         return x
 
 
-class TFLeNet():
+class TFLeNet:
     def __init__(self):
         self._model = models.Sequential(
             [
-                Conv2D(6, (5, 5), activation="tanh", input_shape=(28, 28, 1), padding="same",),
+                Conv2D(
+                    6,
+                    (5, 5),
+                    activation="tanh",
+                    input_shape=(28, 28, 1),
+                    padding="same",
+                ),
                 Conv2D(16, (5, 5), activation="tanh", padding="valid"),
                 Flatten(),
                 Dense(120, activation="relu"),
@@ -45,6 +51,6 @@ class TFLeNet():
                 Dense(10, activation="relu"),
             ]
         )
-    
+
     def model(self):
         return self._model
