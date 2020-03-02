@@ -1,6 +1,6 @@
-import logging, os 
+import logging, os
 
-logging.disable(logging.WARNING) 
+logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import torch
@@ -37,7 +37,13 @@ def create_whiteboard(shape=(600, 600), color="white"):
 
 
 def draw_square(
-    base, topleft=(16, 16), size=16, fill="red", outline="black", width=1, inner_square_margin=1
+    base,
+    topleft=(16, 16),
+    size=16,
+    fill="red",
+    outline="white",
+    width=1,
+    inner_square_margin=1,
 ):
     """TODO add docs
     """
@@ -46,15 +52,25 @@ def draw_square(
         [topleft, topleft[0] + size, topleft[1] + size], fill, outline, width
     )
     del draw
-    return (topleft[0] + size + inner_square_margin, topleft[1] + size + inner_square_margin)
+    return (
+        topleft[0] + size + inner_square_margin,
+        topleft[1] + size + inner_square_margin,
+    )
 
 
-def draw_text(base, topleft, text):
+def draw_text(base, topleft, text, fill="black", position="left"):
     draw = ImageDraw.Draw(base)
     hmargin = 10
+    text = str(text)
     textsize = draw.multiline_textsize(text)
+    offset = 0
+    if position == "right":
+        offset = textsize[0] + hmargin
+    elif position == "left":
+        offset = -(textsize[0] + hmargin)
+    
     draw.multiline_text(
-        (topleft[0] - textsize[0] - hmargin, topleft[1]), text, fill="black"
+        (topleft[0] + offset, topleft[1]), text, fill=fill
     )
     del draw
 
@@ -82,6 +98,21 @@ def map_to_color(numpy_list):
     return np.around(rescale).astype(int)
 
 
+def group_similar_colors(colors):
+    newlist = list()
+    prev, norm = colors[0]
+    thresh = 100
+    newlist.append((prev, norm))
+    for i in range(1, len(colors)):
+        r, g, b = colors[i][0]
+        pr, pg, pb = prev
+        if abs(r - pr) <= thresh and abs(g - pg) <= thresh and abs(b - pb) <= thresh:
+            continue
+        newlist.append(colors[i])
+        prev = colors[i][0]
+    
+    return newlist
+
 def nnprint(model, save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
         size, and output file.
@@ -103,10 +134,10 @@ def nnprint(model, save_path="vis01.png"):
         extra_padding_bottom = 10
         extra_margin_left = 30
         max_line_squares = 16
-
         unique_colors = set()
 
-        colors = color_palette(256)
+        n_rand_colors = 10
+        colors = color_palette(n_rand_colors)
 
         initial_point = (100, 16)
         cur_point = initial_point  # TODO must be defined by default or params values
@@ -127,11 +158,15 @@ def nnprint(model, save_path="vis01.png"):
                     if i > 0 and i % max_line_squares == 0:
                         cur_point = (
                             cur_point[0]
-                            - (square_size + inner_square_margin + linewidth) * max_line_squares,
-                            cur_point[1] + square_size + inner_square_margin + linewidth,
+                            - (square_size + inner_square_margin + linewidth)
+                            * max_line_squares,
+                            cur_point[1]
+                            + square_size
+                            + inner_square_margin
+                            + linewidth,
                         )
-                    colour = colors[norm_map[i] % 256]
-                    unique_colors.add(colour)
+                    colour = colors[norm_map[i] % n_rand_colors]
+                    unique_colors.add((colour, norm[i]))
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,
@@ -148,11 +183,15 @@ def nnprint(model, save_path="vis01.png"):
                     if i > 0 and i % max_line_squares == 0:
                         cur_point = (
                             cur_point[0]
-                            - (square_size + inner_square_margin + linewidth) * max_line_squares,
-                            cur_point[1] + square_size + inner_square_margin + linewidth,
+                            - (square_size + inner_square_margin + linewidth)
+                            * max_line_squares,
+                            cur_point[1]
+                            + square_size
+                            + inner_square_margin
+                            + linewidth,
                         )
-                    colour = colors[norm_map[i] % 256]
-                    unique_colors.add(colour)
+                    colour = colors[norm_map[i] % n_rand_colors]
+                    unique_colors.add((colour, norm[i]))
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,
@@ -162,18 +201,36 @@ def nnprint(model, save_path="vis01.png"):
             # add extra padding between layers
             cur_point = (
                 initial_point[0],
-                cur_point[1] + square_size + inner_square_margin + linewidth + extra_padding_bottom,
+                cur_point[1]
+                + square_size
+                + inner_square_margin
+                + linewidth
+                + extra_padding_bottom,
             )
             layer_id += 1
 
         # adding legend
         # FIXME should be possible set legend position
-        
-        legend_colors = sorted(list(unique_colors))
-        cur_point = (initial_point[0] + square_size*(max_line_squares + linewidth + inner_square_margin) + extra_margin_left, initial_point[1])
-        for colour in legend_colors:
+
+        legend_colors = group_similar_colors(sorted(list(unique_colors)))
+
+        # sort by norm
+        legend_colors.sort(key=lambda item: item[1])
+
+        # print(legend_colors)
+        cur_point = (
+            initial_point[0]
+            + square_size * (max_line_squares + linewidth + inner_square_margin)
+            + extra_margin_left,
+            initial_point[1],
+        )
+        for colour, aprox_norm in legend_colors:
+            draw_text(base, cur_point, "{:^5.2f}".format(aprox_norm), position="right")
             cur_point = draw_square(base, cur_point, fill=colour)
-            cur_point = (cur_point[0] - square_size - inner_square_margin, cur_point[1] + inner_square_margin + linewidth)
+            cur_point = (
+                cur_point[0] - square_size - inner_square_margin,
+                cur_point[1] + inner_square_margin + linewidth,
+            )
 
         base.save(save_path)
 
@@ -211,8 +268,12 @@ def nnprint(model, save_path="vis01.png"):
                     if i > 0 and i % max_line_squares == 0:
                         cur_point = (
                             cur_point[0]
-                            - (square_size + inner_square_margin + linewidth) * max_line_squares,
-                            cur_point[1] + square_size + inner_square_margin + linewidth,
+                            - (square_size + inner_square_margin + linewidth)
+                            * max_line_squares,
+                            cur_point[1]
+                            + square_size
+                            + inner_square_margin
+                            + linewidth,
                         )
                     colour = colors[norm_map[i] % 256]
                     cur_point = draw_square(base, cur_point, fill=colour)
@@ -224,7 +285,11 @@ def nnprint(model, save_path="vis01.png"):
             # add extra padding between layers
             cur_point = (
                 initial_point[0],
-                cur_point[1] + square_size + inner_square_margin + linewidth + extra_padding_bottom,
+                cur_point[1]
+                + square_size
+                + inner_square_margin
+                + linewidth
+                + extra_padding_bottom,
             )
             layer_id += 1
 
