@@ -58,10 +58,7 @@ class ModelProfile:
                     "mean": mean_weights,
                     "min": min_weights,
                     "max": max_weights,
-                    "norm": {
-                        "l1": l1,
-                        "l2": l2,
-                    }
+                    "norm": {"l1": l1, "l2": l2,},
                 }
 
             name_counter += 1
@@ -91,7 +88,9 @@ class ModelProfile:
                 mean = np.mean(weight_copy)
 
                 # norms
-                collaped_axis = (1, 2, 3) if isinstance(layer, keras.layers.Conv2D) else (1,)
+                collaped_axis = (
+                    (1, 2, 3) if isinstance(layer, keras.layers.Conv2D) else (1,)
+                )
                 l1 = np.linalg.norm(weight_copy, ord=1, exis=collaped_axis)
                 l2 = np.linalg.norm(weight_copy, ord=2, exis=collaped_axis)
 
@@ -100,10 +99,7 @@ class ModelProfile:
                     "mean": mean,
                     "min": min_weights,
                     "max": max_weights,
-                    "norm": {
-                        "l1": l1,
-                        "l2": l2,
-                    }
+                    "norm": {"l1": l1, "l2": l2,},
                 }
 
         return layers_info_init
