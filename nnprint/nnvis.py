@@ -1,3 +1,8 @@
+import logging, os 
+
+logging.disable(logging.WARNING) 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -12,17 +17,18 @@ import warnings
 
 from models import ThLeNet, TFLeNet
 
-def create_model(framework='keras'):
+
+def create_model(framework="keras"):
     framework = framework.casefold()
     model = None
-    if framework == 'keras':
+    if framework == "keras":
         model = TFLeNet().model()
-    elif framework == 'torch':
+    elif framework == "torch":
         model = ThLeNet()
 
     if not model:
         raise NotImplemented(f"There is no support for {framework} framework.")
-    
+
     return model
 
 
@@ -31,7 +37,7 @@ def create_whiteboard(shape=(600, 600), color="white"):
 
 
 def draw_square(
-    base, topleft=(16, 16), size=16, fill="red", outline="black", width=1, padding=1
+    base, topleft=(16, 16), size=16, fill="red", outline="black", width=1, inner_square_margin=1
 ):
     """TODO add docs
     """
@@ -40,14 +46,18 @@ def draw_square(
         [topleft, topleft[0] + size, topleft[1] + size], fill, outline, width
     )
     del draw
-    return (topleft[0] + size + padding, topleft[1] + size + padding)
+    return (topleft[0] + size + inner_square_margin, topleft[1] + size + inner_square_margin)
+
 
 def draw_text(base, topleft, text):
     draw = ImageDraw.Draw(base)
     hmargin = 10
     textsize = draw.multiline_textsize(text)
-    draw.multiline_text((topleft[0] - textsize[0] - hmargin, topleft[1]), text, fill="black")
+    draw.multiline_text(
+        (topleft[0] - textsize[0] - hmargin, topleft[1]), text, fill="black"
+    )
     del draw
+
 
 def color_palette(n):
     """Generate n random distinct colors"""
@@ -61,15 +71,16 @@ def color_palette(n):
         g = int(g + step) % 256
         b = int(b + step) % 256
         colors.append((r, g, b))
-    
+
     return colors
 
 
 def map_to_color(numpy_list):
     mn = np.amin(numpy_list)
     mx = np.amax(numpy_list)
-    rescale = (numpy_list - mn) * (255/(mx - mn))
+    rescale = (numpy_list - mn) * (255 / (mx - mn))
     return np.around(rescale).astype(int)
+
 
 def nnprint(model, save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
@@ -80,23 +91,25 @@ def nnprint(model, save_path="vis01.png"):
     if isinstance(model, nn.Module):
 
         warnings.warn(
-            "loading torch model.",
-            Warning,
+            "loading torch model.", Warning,
         )
         # TODO make this a class who can profile the model
         # and create a dict/map/gragh of its params.
         # An Idea is to create a structure where any information about
         # filters, norms, min, max, mean, std etc. can be obtained easily.
         square_size = 16
-        padding = 1
+        inner_square_margin = 1
         linewidth = 1
         extra_padding_bottom = 10
+        extra_margin_left = 30
         max_line_squares = 16
+
+        unique_colors = set()
 
         colors = color_palette(256)
 
         initial_point = (100, 16)
-        cur_point = initial_point # TODO must be defined by default or params values
+        cur_point = initial_point  # TODO must be defined by default or params values
 
         layer_names = list(list(model.modules())[0]._modules.keys())
         # print(layer_names)
@@ -112,10 +125,18 @@ def nnprint(model, save_path="vis01.png"):
                 draw_text(base, cur_point, layer_names[layer_id])
                 for i in range(out_features):
                     if i > 0 and i % max_line_squares == 0:
-                        cur_point = (cur_point[0] - (square_size + padding + linewidth) * max_line_squares, cur_point[1] + square_size + padding + linewidth)
+                        cur_point = (
+                            cur_point[0]
+                            - (square_size + inner_square_margin + linewidth) * max_line_squares,
+                            cur_point[1] + square_size + inner_square_margin + linewidth,
+                        )
                     colour = colors[norm_map[i] % 256]
+                    unique_colors.add(colour)
                     cur_point = draw_square(base, cur_point, fill=colour)
-                    cur_point = (cur_point[0] + padding, cur_point[1] - square_size - padding)
+                    cur_point = (
+                        cur_point[0] + inner_square_margin,
+                        cur_point[1] - square_size - inner_square_margin,
+                    )
             elif isinstance(m, nn.Linear):
                 out_features = m.weight.data.shape[0]
                 weight_copy = m.weight.data.abs().clone().numpy()
@@ -125,29 +146,46 @@ def nnprint(model, save_path="vis01.png"):
                 draw_text(base, cur_point, layer_names[layer_id])
                 for i in range(out_features):
                     if i > 0 and i % max_line_squares == 0:
-                        cur_point = (cur_point[0] - (square_size + padding + linewidth) * max_line_squares, cur_point[1] + square_size + padding + linewidth)
+                        cur_point = (
+                            cur_point[0]
+                            - (square_size + inner_square_margin + linewidth) * max_line_squares,
+                            cur_point[1] + square_size + inner_square_margin + linewidth,
+                        )
                     colour = colors[norm_map[i] % 256]
+                    unique_colors.add(colour)
                     cur_point = draw_square(base, cur_point, fill=colour)
-                    cur_point = (cur_point[0] + padding, cur_point[1] - square_size - padding)
-
-
+                    cur_point = (
+                        cur_point[0] + inner_square_margin,
+                        cur_point[1] - square_size - inner_square_margin,
+                    )
 
             # add extra padding between layers
-            cur_point = (initial_point[0], cur_point[1] + square_size + padding + linewidth + extra_padding_bottom)
+            cur_point = (
+                initial_point[0],
+                cur_point[1] + square_size + inner_square_margin + linewidth + extra_padding_bottom,
+            )
             layer_id += 1
+
+        # adding legend
+        # FIXME should be possible set legend position
+        
+        legend_colors = sorted(list(unique_colors))
+        cur_point = (initial_point[0] + square_size*(max_line_squares + linewidth + inner_square_margin) + extra_margin_left, initial_point[1])
+        for colour in legend_colors:
+            cur_point = draw_square(base, cur_point, fill=colour)
+            cur_point = (cur_point[0] - square_size - inner_square_margin, cur_point[1] + inner_square_margin + linewidth)
 
         base.save(save_path)
 
         return base
 
-    elif isinstance(model,tf.keras.Model):
+    elif isinstance(model, tf.keras.Model):
         warnings.warn(
-            "loading keras model.",
-            Warning,
+            "loading keras model.", Warning,
         )
 
         square_size = 16
-        padding = 1
+        inner_square_margin = 1
         linewidth = 1
         extra_padding_bottom = 10
         max_line_squares = 16
@@ -155,7 +193,7 @@ def nnprint(model, save_path="vis01.png"):
         colors = color_palette(256)
 
         initial_point = (100, 16)
-        cur_point = initial_point 
+        cur_point = initial_point
 
         layer_names = [i.name for i in model.layers]
 
@@ -167,18 +205,27 @@ def nnprint(model, save_path="vis01.png"):
                 weight_copy = np.absolute(layer.get_weights()[0])
                 norm = np.sum(weight_copy, axis=(1))
                 norm_map = map_to_color(norm)
-                
+
                 draw_text(base, cur_point, layer_names[layer_id])
                 for i in range(out_features):
                     if i > 0 and i % max_line_squares == 0:
-                        cur_point = (cur_point[0] - (square_size + padding + linewidth) * max_line_squares, cur_point[1] + square_size + padding + linewidth)
+                        cur_point = (
+                            cur_point[0]
+                            - (square_size + inner_square_margin + linewidth) * max_line_squares,
+                            cur_point[1] + square_size + inner_square_margin + linewidth,
+                        )
                     colour = colors[norm_map[i] % 256]
                     cur_point = draw_square(base, cur_point, fill=colour)
-                    cur_point = (cur_point[0] + padding, cur_point[1] - square_size - padding)
-            
+                    cur_point = (
+                        cur_point[0] + inner_square_margin,
+                        cur_point[1] - square_size - inner_square_margin,
+                    )
 
             # add extra padding between layers
-            cur_point = (initial_point[0], cur_point[1] + square_size + padding + linewidth + extra_padding_bottom)
+            cur_point = (
+                initial_point[0],
+                cur_point[1] + square_size + inner_square_margin + linewidth + extra_padding_bottom,
+            )
             layer_id += 1
 
         base.save(save_path)
@@ -198,13 +245,12 @@ def nnprint(model, save_path="vis01.png"):
 
 
 if __name__ == "__main__":
-    model = create_model(framework='keras')
+    model = create_model(framework="torch")
     # list_created = [i.name for i in model2.layers]
     # print(list_created)
     # print(model2.summary())
-    
+
     # print(list_created)
 
     # nnprint(model_tf, "../images/test.png")
-    nnprint(model, "../images/test2.png")
-
+    nnprint(model, "../images/lenet_torch.png")
