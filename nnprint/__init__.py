@@ -1,6 +1,5 @@
 import warnings
 
 warnings.warn(
-    "Library deprecated yet.",
-    Warning,
+    "Library deprecated yet.", Warning,
 )
