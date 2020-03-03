@@ -25,7 +25,7 @@ class ModelProfile:
         elif self._model_type == "keras":
             layers_info_init = self.fill_keras()
         else:
-            raise NotImplemented(
+            raise NotImplementedError(
                 f"There is no support for {self._model_type} framework."
             )
 
@@ -58,7 +58,7 @@ class ModelProfile:
                     "mean": mean_weights,
                     "min": min_weights,
                     "max": max_weights,
-                    "norm": {"l1": l1, "l2": l2,},
+                    "norm": {"l1": l1, "l2": l2},
                 }
 
             name_counter += 1
@@ -89,7 +89,9 @@ class ModelProfile:
 
                 # norms
                 collaped_axis = (
-                    (1, 2, 3) if isinstance(layer, keras.layers.Conv2D) else (1,)
+                    (1, 2, 3)
+                    if isinstance(layer, keras.layers.Conv2D)
+                    else (1,)
                 )
                 l1 = np.linalg.norm(weight_copy, ord=1, exis=collaped_axis)
                 l2 = np.linalg.norm(weight_copy, ord=2, exis=collaped_axis)
@@ -99,7 +101,7 @@ class ModelProfile:
                     "mean": mean,
                     "min": min_weights,
                     "max": max_weights,
-                    "norm": {"l1": l1, "l2": l2,},
+                    "norm": {"l1": l1, "l2": l2},
                 }
 
         return layers_info_init
