@@ -1,22 +1,21 @@
-import logging, os
-
-logging.disable(logging.WARNING)
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
-import torch
+import logging
+import os
 import torch.nn as nn
-import torch.nn.functional as F
 import tensorflow as tf
 from tensorflow import keras
 
-import random
 import numpy as np
 
-from PIL import Image, ImageDraw
+from PIL import Image
+from PIL import ImageDraw
 import warnings
 
-from models import ThLeNet, TFLeNet
+from models import ThLeNet
+from models import TFLeNet
 import utils
+
+logging.disable(logging.WARNING)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def create_model(framework="keras"):
@@ -28,7 +27,9 @@ def create_model(framework="keras"):
         model = ThLeNet()
 
     if not model:
-        raise NotImplemented(f"There is no support for {framework} framework.")
+        raise NotImplementedError(
+            f"There is no support for {framework} framework."
+        )
 
     return model
 
@@ -108,7 +109,8 @@ def map_to_color(numpy_list):
 #     for i in range(1, len(colors)):
 #         r, g, b = colors[i][0]
 #         pr, pg, pb = prev
-#         if abs(r - pr) <= thresh and abs(g - pg) <= thresh and abs(b - pb) <= thresh:
+#         if abs(r - pr) <= thresh and abs(g - pg) <=
+#                       thresh and abs(b - pb) <= thresh:
 #             continue
 #         newlist.append(colors[i])
 #         prev = colors[i][0]
@@ -143,7 +145,9 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         colors = color_palette(n_rand_colors)
 
         initial_point = (100, 16)
-        cur_point = initial_point  # TODO must be defined by default or params values
+        cur_point = (
+            initial_point  # TODO must be defined by default or params values
+        )
 
         layer_names = list(list(model.modules())[0]._modules.keys())
         # print(layer_names)
@@ -232,7 +236,8 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         # print(legend_colors)
         cur_point = (
             initial_point[0]
-            + square_size * (max_line_squares + linewidth + inner_square_margin)
+            + square_size
+            * (max_line_squares + linewidth + inner_square_margin)
             + extra_margin_left,
             initial_point[1],
         )
@@ -240,14 +245,20 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
             if i == 0:
                 draw_text(
                     base,
-                    (cur_point[0] - square_size - inner_square_margin, cur_point[1]),
+                    (
+                        cur_point[0] - square_size - inner_square_margin,
+                        cur_point[1],
+                    ),
                     "lowest",
                     position="right",
                 )
             elif i == len(legend_colors) - 1:
                 draw_text(
                     base,
-                    (cur_point[0] - square_size - inner_square_margin, cur_point[1]),
+                    (
+                        cur_point[0] - square_size - inner_square_margin,
+                        cur_point[1],
+                    ),
                     "highest",
                     position="right",
                 )
