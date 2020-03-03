@@ -1,17 +1,13 @@
 """ Toy models to make examples
 """
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-import tensorflow as tf
-from tensorflow.keras import layers, models
+from tensorflow.keras import models
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import AveragePooling2D
 
 
 class ThLeNet(nn.Module):

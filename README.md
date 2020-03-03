@@ -24,25 +24,25 @@ pip install .
 
 # How to use it
 
-### For now, just one main feature is avaiable. To check this out, you can just run:
+For now, just one main feature is avaiable. To check this out, you can just run:
 
 ```sh
 cd nnprint
 python nnvis.py
 ```
 
-### The defaults models is instantiated at `nnprint/models`. To change wich you want to use, just change the line 329 at `nnvis.py` to `keras`
+The defaults models is instantiated at `nnprint/models`. To change wich you want to use, just change the line 329 at `nnvis.py` to `keras`
 
 # Output
 
-### The output of our only visualization will probably be like this:
+The output of our only visualization will probably be like this:
 <p align="center">
   <img src="images/test2.png">
 </p>
 
 # Suport
 
-### This library only suports `Torch` and `Keras` models. Check above wich layers we support from each framework:
+ This library only suports `Torch` and `Keras` models. Check above wich layers we support from each framework:
 
 ## Torch
 - Conv2d
@@ -53,4 +53,4 @@ python nnvis.py
 
 # Contribute
 
-## Fork this repository and check our issues. A lot of `good first issues` will be probably avaiable
+Fork this repository and check our issues. A lot of `good first issues` will be probably avaiable
