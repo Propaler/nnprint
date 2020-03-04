@@ -118,7 +118,7 @@ def map_to_color(numpy_list):
 #     return newlist
 
 
-def nnprint(model, save_path="vis01.png"):
+def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
         size, and output file.
     """
@@ -156,8 +156,13 @@ def nnprint(model, save_path="vis01.png"):
         for m in list(model.modules())[1:]:
             if isinstance(m, nn.Conv2d):
                 out_features = m.weight.data.shape[0]
-                weight_copy = m.weight.data.abs().clone().numpy()
-                norm = np.sum(weight_copy, axis=(1, 2, 3))
+                if importance_criteria == "l1":
+                    weight_copy = m.weight.data.abs().clone().numpy()
+                    norm = np.sum(weight_copy, axis=(1, 2, 3))
+                elif importance_criteria == "l2":
+                    weight_copy = np.square(m.weight.data.clone().numpy())
+                    norm = np.sum(weight_copy, axis=(1, 2, 3))
+
                 norm_map = map_to_color(norm)
 
                 draw_text(base, cur_point, layer_names[layer_id])
@@ -181,8 +186,12 @@ def nnprint(model, save_path="vis01.png"):
                     )
             elif isinstance(m, nn.Linear):
                 out_features = m.weight.data.shape[0]
-                weight_copy = m.weight.data.abs().clone().numpy()
-                norm = np.sum(weight_copy, axis=(1))
+                if importance_criteria == "l1":
+                    weight_copy = m.weight.data.abs().clone().numpy()
+                    norm = np.sum(weight_copy, axis=(1))
+                elif importance_criteria == "l2":
+                    weight_copy = np.square(m.weight.data.clone().numpy())
+                    norm = np.sum(weight_copy, axis=(1))
                 norm_map = map_to_color(norm)
 
                 draw_text(base, cur_point, layer_names[layer_id])
@@ -345,4 +354,8 @@ if __name__ == "__main__":
     # print(list_created)
 
     # nnprint(model_tf, "../images/test.png")
-    nnprint(model, "../images/lenet_torch.png")
+    nnprint(
+        model,
+        importance_criteria="l1",
+        save_path="../images/lenet_torch_l1.png",
+    )
