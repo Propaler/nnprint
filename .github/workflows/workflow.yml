@@ -32,7 +32,7 @@ jobs:
         pip3 install flake8-comprehensions
         pip3 install pep8-naming
         flake8 --config=.flake8 .
-        black --check --verbose -l 79 .
+        black --check --verbose .
         
     # - name: Test with pytest
     #   run: |
