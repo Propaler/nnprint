@@ -89,9 +89,7 @@ class ModelProfile:
 
                 # norms
                 collaped_axis = (
-                    (1, 2, 3)
-                    if isinstance(layer, keras.layers.Conv2D)
-                    else (1,)
+                    (1, 2, 3) if isinstance(layer, keras.layers.Conv2D) else (1,)
                 )
                 l1 = np.linalg.norm(weight_copy, ord=1, exis=collaped_axis)
                 l2 = np.linalg.norm(weight_copy, ord=2, exis=collaped_axis)
