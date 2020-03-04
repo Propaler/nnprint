@@ -1,10 +1,13 @@
 import logging
 import os
+
 import torch.nn as nn
+import torch
 import tensorflow as tf
 from tensorflow import keras
 
 import numpy as np
+from scipy.spatial import distance
 
 from PIL import Image
 from PIL import ImageDraw
@@ -17,6 +20,8 @@ import utils
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+torch.manual_seed(41)
+
 
 def create_model(framework="keras"):
     framework = framework.casefold()
@@ -27,9 +32,7 @@ def create_model(framework="keras"):
         model = ThLeNet()
 
     if not model:
-        raise NotImplementedError(
-            f"There is no support for {framework} framework."
-        )
+        raise NotImplementedError(f"There is no support for {framework} framework.")
 
     return model
 
@@ -145,9 +148,7 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         colors = color_palette(n_rand_colors)
 
         initial_point = (100, 16)
-        cur_point = (
-            initial_point  # TODO must be defined by default or params values
-        )
+        cur_point = initial_point  # TODO must be defined by default or params values
 
         layer_names = list(list(model.modules())[0]._modules.keys())
         # print(layer_names)
@@ -155,17 +156,30 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         layer_id = 0
         for m in list(model.modules())[1:]:
             if isinstance(m, nn.Conv2d):
-                out_features = m.weight.data.shape[0]
+                weight_copy = m.weight.data.clone().numpy()
+
                 if importance_criteria == "l1":
-                    weight_copy = m.weight.data.abs().clone().numpy()
-                    norm = np.sum(weight_copy, axis=(1, 2, 3))
+                    abs_weight = np.abs(weight_copy)
+                    norm = np.sum(abs_weight, axis=(1, 2, 3))
                 elif importance_criteria == "l2":
-                    weight_copy = np.square(m.weight.data.clone().numpy())
-                    norm = np.sum(weight_copy, axis=(1, 2, 3))
+                    squared_weight = np.square(weight_copy)
+                    norm = np.sum(squared_weight, axis=(1, 2, 3))
+                elif importance_criteria == "gm":
+                    weight_copy = weight_copy.reshape(weight_copy.shape[0], -1)
+                    similarity_matrix = distance.cdist(
+                        weight_copy, weight_copy, "euclidean"
+                    )
+                    norm = np.sum(np.abs(similarity_matrix), axis=0)
+                else:
+                    raise NotImplementedError(
+                        f"There is no support for {importance_criteria} criteria."
+                    )
 
                 norm_map = map_to_color(norm)
 
                 draw_text(base, cur_point, layer_names[layer_id])
+                out_features = m.weight.data.shape[0]
+
                 for i in range(out_features):
                     if i > 0 and i % max_line_squares == 0:
                         cur_point = (
@@ -185,16 +199,29 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
                         cur_point[1] - square_size - inner_square_margin,
                     )
             elif isinstance(m, nn.Linear):
-                out_features = m.weight.data.shape[0]
+                weight_copy = m.weight.data.clone().numpy()
+
                 if importance_criteria == "l1":
-                    weight_copy = m.weight.data.abs().clone().numpy()
-                    norm = np.sum(weight_copy, axis=(1))
+                    abs_weight = np.abs(weight_copy)
+                    norm = np.sum(abs_weight, axis=(1))
                 elif importance_criteria == "l2":
-                    weight_copy = np.square(m.weight.data.clone().numpy())
-                    norm = np.sum(weight_copy, axis=(1))
+                    squared_weight = np.square(weight_copy)
+                    norm = np.sum(squared_weight, axis=(1))
+                elif importance_criteria == "gm":
+                    similarity_matrix = distance.cdist(
+                        weight_copy, weight_copy, "euclidean"
+                    )
+                    norm = np.sum(np.abs(similarity_matrix), axis=0)
+                else:
+                    raise NotImplementedError(
+                        f"There is no support for {importance_criteria} criteria."
+                    )
+
                 norm_map = map_to_color(norm)
 
                 draw_text(base, cur_point, layer_names[layer_id])
+                out_features = m.weight.data.shape[0]
+
                 for i in range(out_features):
                     if i > 0 and i % max_line_squares == 0:
                         cur_point = (
@@ -236,8 +263,7 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         # print(legend_colors)
         cur_point = (
             initial_point[0]
-            + square_size
-            * (max_line_squares + linewidth + inner_square_margin)
+            + square_size * (max_line_squares + linewidth + inner_square_margin)
             + extra_margin_left,
             initial_point[1],
         )
@@ -245,20 +271,14 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
             if i == 0:
                 draw_text(
                     base,
-                    (
-                        cur_point[0] - square_size - inner_square_margin,
-                        cur_point[1],
-                    ),
+                    (cur_point[0] - square_size - inner_square_margin, cur_point[1],),
                     "lowest",
                     position="right",
                 )
             elif i == len(legend_colors) - 1:
                 draw_text(
                     base,
-                    (
-                        cur_point[0] - square_size - inner_square_margin,
-                        cur_point[1],
-                    ),
+                    (cur_point[0] - square_size - inner_square_margin, cur_point[1],),
                     "highest",
                     position="right",
                 )
@@ -354,8 +374,11 @@ if __name__ == "__main__":
     # print(list_created)
 
     # nnprint(model_tf, "../images/test.png")
+
+    criteria = "gm"
+
     nnprint(
         model,
-        importance_criteria="l1",
-        save_path="../images/lenet_torch_l1.png",
+        importance_criteria=criteria,
+        save_path="../images/lenet_torch_{0}.png".format(criteria),
     )
