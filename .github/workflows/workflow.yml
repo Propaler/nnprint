@@ -2,9 +2,9 @@ name: Run tests
 on:
   push:
     branches:
-    - master
-  paths-ignore:
-    - README.md
+      - master
+    paths-ignore:
+      - README.md
   pull_request:
     types: [opened, synchronize, reopened]
 
