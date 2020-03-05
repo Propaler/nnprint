@@ -46,7 +46,7 @@ def draw_square(
     topleft=(16, 16),
     size=16,
     fill="red",
-    outline="white",
+    outline="lightgrey",
     width=1,
     inner_square_margin=1,
 ):
@@ -80,7 +80,7 @@ def draw_text(base, topleft, text, fill="black", position="left"):
     del draw
 
 
-def color_palette(n):
+def color_palette(pallete="greyscale"):
     """Generate n random distinct colors"""
     # colors = []
     # r = int(random.random() * 256)
@@ -93,7 +93,10 @@ def color_palette(n):
     #     b = int(b + step) % 256
     #     colors.append((r, g, b))
 
-    colors = utils.pallete_mix
+    colors = utils.pallete_greyscale
+    if pallete == "purplescale":
+        colors = utils.pallete_mix
+
     return colors
 
 
@@ -144,8 +147,8 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         max_line_squares = 16
         unique_colors = set()
 
-        n_rand_colors = 15
-        colors = color_palette(n_rand_colors)
+        colors = color_palette()
+        num_colors = len(colors)
 
         initial_point = (100, 16)
         cur_point = initial_point  # TODO must be defined by default or params values
@@ -191,8 +194,9 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
                             + inner_square_margin
                             + linewidth,
                         )
-                    colour = colors[norm_map[i] % n_rand_colors]
-                    unique_colors.add((colour, norm_map[i] % n_rand_colors))
+                    colour_index = norm_map[i] % num_colors
+                    colour = colors[colour_index]
+                    unique_colors.add((colour, colour_index))
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,
@@ -233,8 +237,9 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
                             + inner_square_margin
                             + linewidth,
                         )
-                    colour = colors[norm_map[i] % n_rand_colors]
-                    unique_colors.add((colour, norm_map[i] % n_rand_colors))
+                    colour_index = norm_map[i] % num_colors
+                    colour = colors[colour_index]
+                    unique_colors.add((colour, colour_index))
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,
@@ -303,7 +308,8 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         extra_padding_bottom = 10
         max_line_squares = 16
 
-        colors = color_palette(256)
+        colors = color_palette()
+        num_colors = len(colors)
 
         initial_point = (100, 16)
         cur_point = initial_point
@@ -331,7 +337,8 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
                             + inner_square_margin
                             + linewidth,
                         )
-                    colour = colors[norm_map[i] % 256]
+                    colour_index = norm_map[i] % num_colors
+                    colour = colors[colour_index]
                     cur_point = draw_square(base, cur_point, fill=colour)
                     cur_point = (
                         cur_point[0] + inner_square_margin,

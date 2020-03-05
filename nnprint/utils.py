@@ -1,4 +1,4 @@
-pallete_mix = [
+pallete_purplescale = [
     "#2e3bd1",
     "#393acd",
     "#4539ca",
@@ -14,4 +14,12 @@ pallete_mix = [
     "#b92fac",
     "#c52ea9",
     "#d12ea6",
+]
+
+pallete_greyscale = [
+    "#f0f0f0",
+    "#c0c0c0",
+    "#878787",
+    "#474747",
+    "#000000",
 ]
