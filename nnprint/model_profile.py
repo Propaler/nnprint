@@ -1,6 +1,8 @@
 import torch.nn as nn
 from tensorflow import keras
+
 import numpy as np
+from scipy.spatial import distance
 
 
 class ModelProfile:
@@ -52,13 +54,19 @@ class ModelProfile:
                 collaped_axis = (1, 2, 3) if isinstance(m, nn.Conv2d) else (1,)
                 l1 = np.linalg.norm(weight_copy, ord=1, exis=collaped_axis)
                 l2 = np.linalg.norm(weight_copy, ord=2, exis=collaped_axis)
+                
+                if isinstance(m, nn.Conv2D):
+                    weight_copy = weight_copy.reshape(weight_copy.shape[0], -1)
+                    
+                similarity_matrix = distance.cdist(weight_copy, weight_copy, "euclidean")
+                gm = np.sum(np.abs(similarity_matrix), axis=0)
 
                 layers_info_init[layer_names[name_counter]] = {
                     "sd": sd_weights,
                     "mean": mean_weights,
                     "min": min_weights,
                     "max": max_weights,
-                    "norm": {"l1": l1, "l2": l2},
+                    "norm": {"l1": l1, "l2": l2, "gm": gm},
                 }
 
             name_counter += 1
