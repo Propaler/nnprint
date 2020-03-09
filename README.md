@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/logo.png">
+  <img src="images/lenet_torch.png">
 </p>
 
 <p align="center">
