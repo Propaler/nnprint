@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/lenet_torch.png">
+  <img src="images/logo.png">
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@ The defaults models is instantiated at `nnprint/models`. To change wich you want
 
 The output of our only visualization will probably be like this:
 <p align="center">
-  <img src="images/test2.png">
+  <img src="images/lenet_torch.png">
 </p>
 
 # Suport
