@@ -4,4 +4,8 @@ from nnprint.visualizations.base import BaseVisualization
 class TreeMap(BaseVisualization):
     """TreeMap of model layer types"""
 
-    pass
+    def print():
+        pass
+
+    def save(path):
+        pass
