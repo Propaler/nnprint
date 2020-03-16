@@ -6,6 +6,7 @@ from nnprint.drawing.object_drawable import ObjectDrawable
 from PIL import Image
 from PIL import ImageDraw
 
+
 class BaseVisualization(AbstractVisualization, ObjectDrawable):
     """Defines the functions in common with any display 
     such as positioning of subtitles and description data.
@@ -44,7 +45,7 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
     @classmethod
     def create_whiteboard(cls):
         return Image.new(cls._image_type, cls._shape, cls._color)
-        
+
     def draw_square(
         self,
         base,

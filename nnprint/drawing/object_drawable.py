@@ -8,7 +8,7 @@ class ObjectDrawable:
     _shape = (600, 400)  # FIXME set default shape
     _position = (0, 0)  # FIXME set default top-left position
     _color = "white"
-    
+
     def shape(self, shape):
         """Sets the size of the drawable object"""
         self._shape = shape
