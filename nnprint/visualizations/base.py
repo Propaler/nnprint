@@ -23,6 +23,13 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
         # TODO automatically identify the type of mask structure given.
         self._mask = mask
 
+        # TODO creates a base whiteboard
+        self._base = cls.create_whiteboard()
+
+    @classmethod
+    def create_whiteboard(cls, shape=(600, 600), color="white"):
+        return Image.new("RGB", shape, color)
+
     def title(self, text, position=None):
         """Add a title to visualization"""
         # TODO
