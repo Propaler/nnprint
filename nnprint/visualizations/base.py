@@ -1,7 +1,9 @@
 from abc import abstractmethod
 
+from nnprint.model_profile import ModelProfile
 from nnprint.visualizations.abstract import AbstractVisualization
 from nnprint.drawing.object_drawable import ObjectDrawable
+
 
 from PIL import Image
 from PIL import ImageDraw
@@ -17,9 +19,9 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
     """
 
     def __init__(self, model, mask=None):
-        self.model = model
+        self._model = ModelProfile(model)
         # TODO automatically identify the type of mask structure given.
-        self.mask = mask
+        self._mask = mask
 
     def title(self, text, position=None):
         """Add a title to visualization"""
