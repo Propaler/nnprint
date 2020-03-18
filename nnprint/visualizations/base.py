@@ -24,7 +24,7 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
         self._mask = mask
 
         # TODO creates a base whiteboard
-        self._base = cls.create_whiteboard()
+        self._base = BaseVisualization.create_whiteboard()
 
     @classmethod
     def create_whiteboard(cls, shape=(600, 600), color="white"):
