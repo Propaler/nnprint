@@ -5,7 +5,7 @@ from nnprint.utils import color_palette, map_to_color
 class NormScaleGrid(BaseVisualization):
     """Filter norm visualization grid"""
 
-    def print():
+    def print(self):
 
         square_size = 16
         inner_square_margin = 1
@@ -164,5 +164,5 @@ class NormScaleGrid(BaseVisualization):
 
         return self._base
 
-    def save(path):
+    def save(self, path):
         self._base.save(path)
