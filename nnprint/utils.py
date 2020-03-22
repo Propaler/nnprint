@@ -1,3 +1,21 @@
+import numpy as np
+
+
+def color_palette(pallete="greyscale"):
+    colors = pallete_greyscale
+    if pallete == "purplescale":
+        colors = pallete_mix
+
+    return colors
+
+
+def map_to_color(numpy_list):
+    mn = np.amin(numpy_list)
+    mx = np.amax(numpy_list)
+    rescale = (numpy_list - mn) * (255 / (mx - mn))
+    return np.around(rescale).astype(int)
+
+
 pallete_purplescale = [
     "#2e3bd1",
     "#393acd",
