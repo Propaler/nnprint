@@ -4,7 +4,7 @@ import numpy as np
 def color_palette(pallete="greyscale"):
     colors = pallete_greyscale
     if pallete == "purplescale":
-        colors = pallete_mix
+        colors = pallete_purplescale
 
     return colors
 
