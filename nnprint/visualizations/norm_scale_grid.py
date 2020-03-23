@@ -1,11 +1,13 @@
 from nnprint.visualizations.base import BaseVisualization
 from nnprint.utils import color_palette, map_to_color
 
+import numpy as np
+
 
 class NormScaleGrid(BaseVisualization):
     """Filter norm visualization grid"""
 
-    def print(self):
+    def print(self, importance_criteria="l1"):
 
         square_size = 16
         inner_square_margin = 1
