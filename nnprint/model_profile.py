@@ -1,8 +1,9 @@
-import torch.nn as nn
-from tensorflow import keras
-
 import numpy as np
+import torch.nn as nn
+
+from tensorflow import keras
 from scipy.spatial import distance
+from collections import OrderedDict
 
 
 class ModelProfile:
@@ -37,7 +38,7 @@ class ModelProfile:
         """
         Fill when is a torch model
         """
-        layers_info_init = {}
+        layers_info_init = OrderedDict()
 
         layer_names = list(list(self._model.modules())[0]._modules.keys())
         name_counter = 0
@@ -80,7 +81,7 @@ class ModelProfile:
         Fill when is a keras model
         """
 
-        layers_info_init = {}
+        layers_info_init = OrderedDict()
 
         for layer in self._model.layers:
             if isinstance(layer, keras.layers.Dense) or isinstance(
