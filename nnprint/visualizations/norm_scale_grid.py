@@ -2,6 +2,8 @@ from nnprint.visualizations.base import BaseVisualization
 from nnprint.utils import color_palette, map_to_color
 
 import numpy as np
+import torch.nn as nn
+from scipy.spatial import distance
 
 
 class NormScaleGrid(BaseVisualization):
@@ -24,7 +26,8 @@ class NormScaleGrid(BaseVisualization):
         cur_point = initial_point  # TODO must be defined by default or params values
 
         # layer_names = list(list(self._model.modules())[0]._modules.keys())
-        layer_names = self._model.get_layers_info()
+        model = self._model.get_layers_info()
+        layer_names = model.keys()  # FIXME
         # print(layer_names)
 
         layer_id = 0
