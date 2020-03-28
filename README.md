@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/logo.png">
+  <img src="https://raw.githubusercontent.com/Propaler/nnprint/master/images/logo.png">
 </p>
 
 <p align="center">
@@ -15,13 +15,18 @@
 >
 </p>
 
-# How to install
+---
+
+## How to install
+
+First clone this repo.
 
 ```sh
+cd nnprint
 pip install .
 ```
 
-# How to use it
+## How to use it
 
 For now, just one main feature is avaiable. To check this out, you can just run:
 
@@ -32,24 +37,24 @@ python nnvis.py
 
 The defaults models is instantiated at `nnprint/models`. To change wich you want to use, just change the line 329 at `nnvis.py` to `keras`
 
-# Output
+## Output
 
 The output of our only visualization will probably be like this:
 <p align="center">
-  <img src="images/lenet_torch.png">
+  <img src="https://raw.githubusercontent.com/Propaler/nnprint/master/images/lenet_torch.png">
 </p>
 
-# Suport
+## Suport
 
  This library only suports `Torch` and `Keras` models. Check above wich layers we support from each framework:
 
-## Torch
+### Torch
 - Conv2d
 - Linear
 
-## Keras
+### Keras
 - Dense
 
-# Contribute
+## Contribute
 
 Fork this repository and check our issues. A lot of `good first issues` will be probably avaiable
