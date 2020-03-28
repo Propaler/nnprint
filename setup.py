@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 requirements = (lambda f: [str(i.req) for i in parse(f, session=False)])(
-    "requirements.txt"
+    "pip-dep/requirements.txt"
 )
 
 setuptools.setup(
@@ -17,7 +17,7 @@ setuptools.setup(
     version="0.0.1",
     author="Propaler",
     author_email="jefersonnpn@gmail.com",
-    description="A library for better visualization of Neural Networks",
+    description="A visualization library for better insight into neural networks",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Propaler/nnprint",
