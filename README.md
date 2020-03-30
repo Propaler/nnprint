@@ -31,7 +31,6 @@ pip install .
 For now, just one main feature is avaiable. To check this out, you can just run:
 
 ```sh
-cd nnprint
 python nnvis.py
 ```
 
