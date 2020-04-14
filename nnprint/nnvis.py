@@ -19,6 +19,7 @@ from models import TFLeNet
 import utils
 
 import argparse
+
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -31,12 +32,17 @@ def arg_parse():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--title", dest="title", help="Visualization title", default=None)
-    parser.add_argument("--subtitle", dest="subtitle", help="Visualization subtitle", default=None)
-    parser.add_argument("--title_font_size", dest='title_font_size', type=int, default=0)
+    parser.add_argument(
+        "--title", dest="title", help="Visualization title", default=None
+    )
+    parser.add_argument(
+        "--subtitle", dest="subtitle", help="Visualization subtitle", default=None
+    )
+    parser.add_argument(
+        "--title_font_size", dest="title_font_size", type=int, default=0
+    )
 
     return parser.parse_args()
-
 
 
 def create_model(framework="keras"):
@@ -63,11 +69,14 @@ def draw_title(base, point, args):
     if args.title is not None:
 
         draw = ImageDraw.Draw(base)
-        fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', args.title_font_size) 
+        fnt = ImageFont.truetype(
+            "Pillow/Tests/fonts/FreeMono.ttf", args.title_font_size
+        )
 
-        draw.text(point, args.title ,font=fnt, fill='black', align ="left")
+        draw.text(point, args.title, font=fnt, fill="black", align="left")
 
         del draw
+
 
 def draw_square(
     base,
@@ -178,7 +187,7 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
 
         colors = color_palette()
         num_colors = len(colors)
-        
+
         initial_point_title = (100, 16)
         initial_point = (100, 16 + args.title_font_size)
         cur_point = initial_point  # TODO must be defined by default or params values
