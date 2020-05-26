@@ -17,6 +17,8 @@ from models import ThLeNet
 from models import TFLeNet
 import utils
 
+from visualizations.norm_scale_grid import NormScaleGrid
+
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -382,10 +384,13 @@ if __name__ == "__main__":
 
     # nnprint(model_tf, "../images/test.png")
 
-    criteria = "gm"
+    print(model)
+    p = NormScaleGrid(model)
 
-    nnprint(
-        model,
-        importance_criteria=criteria,
-        save_path="../images/lenet_torch_{0}.png".format(criteria),
-    )
+    # criteria = "gm"
+
+    # nnprint(
+    #     model,
+    #     importance_criteria=criteria,
+    #     save_path="../images/lenet_torch_{0}.png".format(criteria),
+    # )
