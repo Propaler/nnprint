@@ -13,14 +13,14 @@ requirements = (lambda f: [str(i.req) for i in parse(f, session=False)])(
 )
 
 setuptools.setup(
-    name="nnprint",
+    name="nnpretty",
     version="0.0.1",
     author="Propaler",
     author_email="jefersonnpn@gmail.com",
     description="A visualization library for better insight into neural networks",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Propaler/nnprint",
+    url="https://github.com/Propaler/nnpretty",
     packages=setuptools.find_packages(),
     install_requires=requirements,
     classifiers=[
