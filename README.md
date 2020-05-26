@@ -1,6 +1,6 @@
-<p align="center">
+<!--<p align="center">
   <img src="https://raw.githubusercontent.com/Propaler/nnprint/master/images/logo.png">
-</p>
+</p>-->
 
 <p align="center">
 <a class="reference external" href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
@@ -17,50 +17,11 @@
 
 ---
 
-## How to install
+## Install
 
-First clone this repo.
-
-```sh
-cd nnprint
-pip install .
-```
-
-## How to use it
-
-For now, just one main feature is avaiable. To check this out, you can just run:
-
-```sh
-python nnvis.py
-```
-
-If you want to add title, you can just run:
-
-```sh
-python nnvis.py --title 'Titulo do grafico' --title_font_size 30
-```
-
-
-The defaults models is instantiated at `nnprint/models`. To change wich you want to use, just change the line 329 at `nnvis.py` to `keras`
-
-## Output
-
-The output of our only visualization will probably be like this:
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Propaler/nnprint/master/images/lenet_torch.png">
-</p>
-
-## Suport
-
- This library only suports `Torch` and `Keras` models. Check above wich layers we support from each framework:
-
-### Torch
-- Conv2d
-- Linear
-
-### Keras
-- Dense
+1. Clone this repo.
+2. cd nnpretty
+3. pip install .
 
 ## Contribute
 
-Fork this repository and check our issues. A lot of `good first issues` will be probably avaiable
