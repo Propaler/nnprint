@@ -34,6 +34,13 @@ For now, just one main feature is avaiable. To check this out, you can just run:
 python nnvis.py
 ```
 
+If you want to add title, you can just run:
+
+```sh
+python nnvis.py --title 'Titulo do grafico' --title_font_size 30
+```
+
+
 The defaults models is instantiated at `nnprint/models`. To change wich you want to use, just change the line 329 at `nnvis.py` to `keras`
 
 ## Output

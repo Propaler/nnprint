@@ -11,18 +11,42 @@ from scipy.spatial import distance
 
 from PIL import Image
 from PIL import ImageDraw
+from PIL import ImageFont
 import warnings
 
 from models import ThLeNet
 from models import TFLeNet
 import utils
 
+<<<<<<< HEAD
 from visualizations.norm_scale_grid import NormScaleGrid
+=======
+import argparse
+>>>>>>> 0b340fbea995492671ca2c86849d7da49d3db918
 
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 torch.manual_seed(41)
+
+
+def arg_parse():
+    """
+    Parse arguements to train federated models
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--title", dest="title", help="Visualization title", default=None
+    )
+    parser.add_argument(
+        "--subtitle", dest="subtitle", help="Visualization subtitle", default=None
+    )
+    parser.add_argument(
+        "--title_font_size", dest="title_font_size", type=int, default=0
+    )
+
+    return parser.parse_args()
 
 
 def create_model(framework="keras"):
@@ -41,6 +65,21 @@ def create_model(framework="keras"):
 
 def create_whiteboard(shape=(600, 600), color="white"):
     return Image.new("RGB", shape, color)
+
+
+def draw_title(base, point, args):
+    """TODO add docs"""
+
+    if args.title is not None:
+
+        draw = ImageDraw.Draw(base)
+        fnt = ImageFont.truetype(
+            "Pillow/Tests/fonts/FreeMono.ttf", args.title_font_size
+        )
+
+        draw.text(point, args.title, font=fnt, fill="black", align="left")
+
+        del draw
 
 
 def draw_square(
@@ -130,6 +169,7 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
         size, and output file.
     """
+    args = arg_parse()
     base = create_whiteboard()
 
     if isinstance(model, nn.Module):
@@ -152,9 +192,11 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         colors = color_palette()
         num_colors = len(colors)
 
-        initial_point = (100, 16)
+        initial_point_title = (100, 16)
+        initial_point = (100, 16 + args.title_font_size)
         cur_point = initial_point  # TODO must be defined by default or params values
 
+        draw_title(base, initial_point_title, args)
         layer_names = list(list(model.modules())[0]._modules.keys())
         # print(layer_names)
 
