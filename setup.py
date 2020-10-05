@@ -8,9 +8,14 @@ except ImportError:  # for pip <= 9.0.3
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-requirements = (lambda f: [str(i.req) for i in parse(f, session=False)])(
-    "pip-dep/requirements.txt"
-)
+try:
+    requirements = (lambda f: [str(i.req) for i in parse(f, session=False)])(
+        "pip-dep/requirements.txt"
+    )
+except:
+    requirements = (lambda f: [str(i.requirement) for i in parse(f, session=False)])(
+        "pip-dep/requirements.txt"
+    )
 
 setuptools.setup(
     name="nnprint",
