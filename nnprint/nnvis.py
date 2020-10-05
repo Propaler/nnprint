@@ -14,9 +14,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import warnings
 
-from models import ThLeNet
-from models import TFLeNet
-import utils
+from nnprint import utils
 
 import argparse
 
@@ -197,7 +195,7 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
 
         draw_title(base, initial_point_title, args)
         layer_names = list(list(model.modules())[0]._modules.keys())
-        # print(layer_names)
+
 
         layer_id = 0
         for m in list(model.modules())[1:]:
@@ -412,30 +410,3 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
     else:
         print("Type model supported yet ")
 
-
-# ------- TEST -------
-
-
-# bottomright = (16, 16)
-# for i in range(5):
-#     bottomright = draw_square(base, bottomright)
-#     bottomright = (bottomright[0] + 1, bottomright[1] - 16 - 1)
-
-
-if __name__ == "__main__":
-    model = create_model(framework="torch")
-    # list_created = [i.name for i in model2.layers]
-    # print(list_created)
-    # print(model2.summary())
-
-    # print(list_created)
-
-    # nnprint(model_tf, "../images/test.png")
-
-    criteria = "gm"
-
-    nnprint(
-        model,
-        importance_criteria=criteria,
-        save_path="../images/lenet_torch_{0}.png".format(criteria),
-    )
