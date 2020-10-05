@@ -150,14 +150,20 @@ class NormScaleGrid(BaseVisualization):
             if i == 0:
                 self.draw_text(
                     self._base,
-                    (cur_point[0] - square_size - inner_square_margin, cur_point[1],),
+                    (
+                        cur_point[0] - square_size - inner_square_margin,
+                        cur_point[1],
+                    ),
                     "lowest",
                     position="right",
                 )
             elif i == len(legend_colors) - 1:
                 self.draw_text(
                     self._base,
-                    (cur_point[0] - square_size - inner_square_margin, cur_point[1],),
+                    (
+                        cur_point[0] - square_size - inner_square_margin,
+                        cur_point[1],
+                    ),
                     "highest",
                     position="right",
                 )

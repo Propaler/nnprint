@@ -87,8 +87,7 @@ def draw_square(
     width=1,
     inner_square_margin=1,
 ):
-    """TODO add docs
-    """
+    """TODO add docs"""
     draw = ImageDraw.Draw(base)
     draw.rectangle(
         [topleft, topleft[0] + size, topleft[1] + size], fill, outline, width
@@ -112,7 +111,10 @@ def draw_text(base, topleft, text, fill="black", position="left"):
         offset = -(textsize[0] + hmargin)
 
     draw.multiline_text(
-        (topleft[0] + offset, topleft[1]), text, fill=fill, align="left",
+        (topleft[0] + offset, topleft[1]),
+        text,
+        fill=fill,
+        align="left",
     )
     del draw
 
@@ -163,7 +165,7 @@ def map_to_color(numpy_list):
 
 def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
     """TODO add support to custom parameters like visualization type,
-        size, and output file.
+    size, and output file.
     """
     args = arg_parse()
     base = create_whiteboard()
@@ -171,7 +173,8 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
     if isinstance(model, nn.Module):
 
         warnings.warn(
-            "loading torch model.", Warning,
+            "loading torch model.",
+            Warning,
         )
         # TODO make this a class who can profile the model
         # and create a dict/map/gragh of its params.
@@ -316,14 +319,20 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
             if i == 0:
                 draw_text(
                     base,
-                    (cur_point[0] - square_size - inner_square_margin, cur_point[1],),
+                    (
+                        cur_point[0] - square_size - inner_square_margin,
+                        cur_point[1],
+                    ),
                     "lowest",
                     position="right",
                 )
             elif i == len(legend_colors) - 1:
                 draw_text(
                     base,
-                    (cur_point[0] - square_size - inner_square_margin, cur_point[1],),
+                    (
+                        cur_point[0] - square_size - inner_square_margin,
+                        cur_point[1],
+                    ),
                     "highest",
                     position="right",
                 )
@@ -339,7 +348,8 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
 
     elif isinstance(model, tf.keras.Model):
         warnings.warn(
-            "loading keras model.", Warning,
+            "loading keras model.",
+            Warning,
         )
 
         square_size = 16
