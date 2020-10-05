@@ -22,6 +22,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 torch.manual_seed(41)
 
+
 def create_whiteboard(shape=(600, 600), color="white"):
     return Image.new("RGB", shape, color)
 
@@ -32,9 +33,7 @@ def draw_title(base, point, title, title_font_size):
     if title is not None:
 
         draw = ImageDraw.Draw(base)
-        fnt = ImageFont.truetype(
-            "Pillow/Tests/fonts/FreeMono.ttf", title_font_size
-        )
+        fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", title_font_size)
 
         draw.text(point, title, font=fnt, fill="black", align="left")
 
@@ -126,7 +125,14 @@ def map_to_color(numpy_list):
 #     return newlist
 
 
-def nnprint(model, importance_criteria="l1", save_path="vis01.png", title_font_size=30, title=None, subtitle=None):
+def nnprint(
+    model,
+    importance_criteria="l1",
+    save_path="vis01.png",
+    title_font_size=30,
+    title=None,
+    subtitle=None,
+):
     """TODO add support to custom parameters like visualization type,
     size, and output file.
     """
@@ -159,7 +165,6 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png", title_font_s
 
         draw_title(base, initial_point_title, title, title_font_size)
         layer_names = list(list(model.modules())[0]._modules.keys())
-
 
         layer_id = 0
         for m in list(model.modules())[1:]:
@@ -373,4 +378,3 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png", title_font_s
         return base
     else:
         print("Type model supported yet ")
-
