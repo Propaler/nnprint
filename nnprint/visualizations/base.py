@@ -10,9 +10,9 @@ from PIL import ImageDraw
 
 
 class BaseVisualization(AbstractVisualization, ObjectDrawable):
-    """Defines the functions in common with any display 
+    """Defines the functions in common with any display
     such as positioning of subtitles and description data.
-    
+
     Args:
         model: Model to be used.
         mask: Mask structure to represent weights, filters or layers to be hidden.
@@ -66,7 +66,7 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
         inner_square_margin=1,
     ):
         """Draws a simple square on a base image.
-        
+
         Args:
             base: A PIL Image instance.
             topleft: The top-left to start the drawing.
@@ -75,9 +75,9 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
             outline: Square border color.
             width: Square border width.
             inner_square_margin: Margin size between squares.
-        
+
         Returns:
-            The Cartesian coordinate (tuple) of the bottom-right 
+            The Cartesian coordinate (tuple) of the bottom-right
             point of the drawing.
 
         """
@@ -93,13 +93,13 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
 
     def draw_text(self, base, topleft, text, fill="black", position="left"):
         """Draws plain text on a base image.
-        
+
         Args:
             base: A PIL Image instance.
             topleft: The top-left to start the drawing.
             text: Text to be drawn.
             fill: Font color:
-            position: Position where the text should be in relation to 
+            position: Position where the text should be in relation to
                 the top-left coordinate.
         """
         draw = ImageDraw.Draw(base)
@@ -113,6 +113,9 @@ class BaseVisualization(AbstractVisualization, ObjectDrawable):
             offset = -(textsize[0] + hmargin)
 
         draw.multiline_text(
-            (topleft[0] + offset, topleft[1]), text, fill=fill, align="left",
+            (topleft[0] + offset, topleft[1]),
+            text,
+            fill=fill,
+            align="left",
         )
         del draw
