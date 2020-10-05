@@ -31,14 +31,22 @@ pip install .
 For now, just one main feature is avaiable. To check this out, you can just run:
 
 ```sh
-python nnvis.py
+from nnprint import nnprint
+
+model = <torch, tensorflow>
+
+nnprint(model)
 ```
 
-If you want to add title, you can just run:
+**nnprint Arguments**
 
-```sh
-python nnvis.py --title 'Titulo do grafico' --title_font_size 30
-```
+- `model` - model that will be printed
+- `importance_criteria` - way that weights will be classified
+- `save_path` - file that the image will be save
+- `title_font_size` - title font size
+- `title` - graph title
+- `subtile` - graph subtitle
+
 
 
 The defaults models is instantiated at `nnprint/models`. To change wich you want to use, just change the line 329 at `nnvis.py` to `keras`
