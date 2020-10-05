@@ -1,5 +1,6 @@
 Pillow
 tensorflow
 torch
+scipy
 black
-
+pytest
