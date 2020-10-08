@@ -14,11 +14,8 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import warnings
 
-from models import ThLeNet
-from models import TFLeNet
-import utils
+from nnprint import utils
 
-import argparse
 
 logging.disable(logging.WARNING)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -26,54 +23,19 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 torch.manual_seed(41)
 
 
-def arg_parse():
-    """
-    Parse arguements to train federated models
-    """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--title", dest="title", help="Visualization title", default=None
-    )
-    parser.add_argument(
-        "--subtitle", dest="subtitle", help="Visualization subtitle", default=None
-    )
-    parser.add_argument(
-        "--title_font_size", dest="title_font_size", type=int, default=0
-    )
-
-    return parser.parse_args()
-
-
-def create_model(framework="keras"):
-    framework = framework.casefold()
-    model = None
-    if framework == "keras":
-        model = TFLeNet().model()
-    elif framework == "torch":
-        model = ThLeNet()
-
-    if not model:
-        raise NotImplementedError(f"There is no support for {framework} framework.")
-
-    return model
-
-
 def create_whiteboard(shape=(600, 600), color="white"):
     return Image.new("RGB", shape, color)
 
 
-def draw_title(base, point, args):
+def draw_title(base, point, title, title_font_size):
     """TODO add docs"""
 
-    if args.title is not None:
+    if title is not None:
 
         draw = ImageDraw.Draw(base)
-        fnt = ImageFont.truetype(
-            "Pillow/Tests/fonts/FreeMono.ttf", args.title_font_size
-        )
+        fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", title_font_size)
 
-        draw.text(point, args.title, font=fnt, fill="black", align="left")
+        draw.text(point, title, font=fnt, fill="black", align="left")
 
         del draw
 
@@ -163,11 +125,17 @@ def map_to_color(numpy_list):
 #     return newlist
 
 
-def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
+def nnprint(
+    model,
+    importance_criteria="l1",
+    save_path="vis01.png",
+    title_font_size=30,
+    title=None,
+    subtitle=None,
+):
     """TODO add support to custom parameters like visualization type,
     size, and output file.
     """
-    args = arg_parse()
     base = create_whiteboard()
 
     if isinstance(model, nn.Module):
@@ -192,12 +160,11 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         num_colors = len(colors)
 
         initial_point_title = (100, 16)
-        initial_point = (100, 16 + args.title_font_size)
+        initial_point = (100, 16 + title_font_size)
         cur_point = initial_point  # TODO must be defined by default or params values
 
-        draw_title(base, initial_point_title, args)
+        draw_title(base, initial_point_title, title, title_font_size)
         layer_names = list(list(model.modules())[0]._modules.keys())
-        # print(layer_names)
 
         layer_id = 0
         for m in list(model.modules())[1:]:
@@ -411,31 +378,3 @@ def nnprint(model, importance_criteria="l1", save_path="vis01.png"):
         return base
     else:
         print("Type model supported yet ")
-
-
-# ------- TEST -------
-
-
-# bottomright = (16, 16)
-# for i in range(5):
-#     bottomright = draw_square(base, bottomright)
-#     bottomright = (bottomright[0] + 1, bottomright[1] - 16 - 1)
-
-
-if __name__ == "__main__":
-    model = create_model(framework="torch")
-    # list_created = [i.name for i in model2.layers]
-    # print(list_created)
-    # print(model2.summary())
-
-    # print(list_created)
-
-    # nnprint(model_tf, "../images/test.png")
-
-    criteria = "gm"
-
-    nnprint(
-        model,
-        importance_criteria=criteria,
-        save_path="../images/lenet_torch_{0}.png".format(criteria),
-    )
